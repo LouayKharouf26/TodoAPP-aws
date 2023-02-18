@@ -1,0 +1,146 @@
+.navbar {
+    width: 250px;
+    float: left;
+    height: 100vh;
+    font-family: 'Poppins';
+font-style: normal;
+color: #000000;
+display: block;
+padding: 10px;
+text-decoration: none;
+background-color: #3c3c3d;
+  }
+  
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    
+  }
+  .nav-link{color: #fff;}
+  .nav-link:hover{color: #fff;
+opacity: 1.0;}
+ li {
+    width: 200px;
+  }
+  a:hover {
+    opacity: 1.0;
+  }
+  /*
+  .navbar a {
+ 
+  }
+  
+a:hover {
+    background-color: #cccccc;
+  }
+*/
+.todo{
+    position: relative;
+    left:20% ;
+}
+.add{
+    position: absolute;
+    top: 90%;
+}
+/*SignIn CSS */
+.signbx{
+    position: absolute;
+    width: 1000px;
+    left: 35%;
+    top: 25%;
+}
+/*TYPEWRITER */
+.typewriter  {
+    position: relative;
+    left: 2%;
+    overflow: hidden; /* Ensures the content is not revealed until the animation */
+    border-right: .15em solid orange; /* The typwriter cursor */
+    white-space: nowrap; /* Keeps the content on a single line */
+    margin: 5 auto; /* Gives that scrolling effect as the typing happens */
+    letter-spacing: .15em; /* Adjust as needed */
+    animation: 
+      typing 3.5s steps(40, end),
+      blink-caret .75s step-end infinite;
+      font-family: 'Poppins';
+font-style: normal;
+font-weight: 500;
+font-size: 25px;
+line-height: 47px;
+     
+  }
+  
+  /* The typing effect */
+  @keyframes typing {
+    from { width: 0 }
+    to { width: 70% }
+  }
+  
+  /* The typewriter cursor effect */
+  @keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: orange; }
+  }
+#email{
+    width: 650px;
+height: 55px;
+}
+#password{
+    width: 650px;
+    height: 55px;
+}
+.remember{
+    position: relative;
+    left: 18%;
+}
+.fpassword{
+    position: relative;
+    left: -125%; 
+    top: -95%;
+}
+.login ,.register{
+    position: relative;
+    left: -38%;
+    width: 451px;
+    height: 54px;
+}
+#name{
+    width: 650px;
+    height: 55px; 
+}
+#password-confirm{
+    width: 650px;
+    height: 55px; 
+}
+#addtask{
+    position: absolute;
+    top: 80%;
+    left: 20%;
+    width: 650px;
+    height: 55px;
+}
+#addbtn{
+  position: absolute;
+    top: 80%;
+    right: 25%;
+   
+}
+.taskname{
+  position: relative;
+  top: 20%;
+  left: 5%;
+  width: 451px;
+  height: 54px;
+  background: #FFFFFF;
+border-radius: 10px;
+font-family: 'Poppins';
+font-style: normal;
+font-weight: 500;
+font-size: 16px;
+line-height: 24px;
+/* identical to box height */
+
+
+color: #000000;
+
+}
