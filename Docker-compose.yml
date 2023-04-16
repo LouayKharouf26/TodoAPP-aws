@@ -20,5 +20,7 @@ services:
       DB_DATABASE: Todo
       DB_USERNAME: laravel
       DB_PASSWORD: secret
+    volumes:
+      - ./vendor:/app/vendor
 volumes:
   db-data:
