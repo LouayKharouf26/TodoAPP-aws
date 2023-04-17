@@ -31,7 +31,7 @@ pipeline{
                 }
             }
         }        
-    
+   /* 
     post{
         success{
             echo "========pipeline executed successfully ========"
@@ -39,5 +39,4 @@ pipeline{
         failure{
             echo "========pipeline execution failed========"
         }
-    }
-}
+    }*/
