@@ -15,14 +15,10 @@ pipeline{
                     echo "======== executing ========"
                         sh "pwd"
                         sh "ls"
-                        dir ("terraform-template/linux") {
-                                sh "pwd"
-                                sh "ls"
-                                echo "terraform init"
-                                sh "terraform init"
-                                sh "terraform apply --auto-approve "
-                                
-                            }            
+                        echo "terraform init"
+                        sh "terraform init"
+                        sh "terraform apply --auto-approve "     
+                       }            
                         }
                     }            
                 }
