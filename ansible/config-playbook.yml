@@ -1,0 +1,39 @@
+---
+- name: install Nginx
+  hosts: vm
+  become: true
+  vars:
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+  tasks: 
+    - name: update the packages
+      apt: 
+        update_cache: yes #apt get update
+    - name: install nginx
+      apt: 
+        name: nginx
+        state: present
+    - name: Enable UFW
+      systemd:
+        name: ufw
+        enabled: yes
+        state: started
+    - name: Allow Incoming Nginx HTTP Connections
+      ufw:
+        rule: allow
+        port: 8080
+        proto: tcp
+
+    - name: Set Nginx to Listen on Port 8080
+      lineinfile:
+        path: /etc/nginx/sites-available/default
+        regexp: '^(\s*)listen'
+        line: 'listen 8080;'
+        backup: yes
+
+    - name: reload
+      ufw:
+        state: reloaded
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
