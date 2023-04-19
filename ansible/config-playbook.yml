@@ -1,9 +1,12 @@
 ---
-- name: install Nginx
+- name: install Project tools
   hosts: vm
   become: true
   vars:
     ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+    mysql_db_user: laravel
+    mysql_db_password: secret
+    mysql_db_name: todoapp
   tasks: 
     - name: update the packages
       apt: 
@@ -12,28 +15,78 @@
       apt: 
         name: nginx
         state: present
-    - name: Enable UFW
-      systemd:
-        name: ufw
-        enabled: yes
-        state: started
-    - name: Allow Incoming Nginx HTTP Connections
+  
+    - name: Allow Nginx HTTP  #add a rule to the firewall 
       ufw:
         rule: allow
-        port: 8080
-        proto: tcp
-
-    - name: Set Nginx to Listen on Port 8080
-      lineinfile:
-        path: /etc/nginx/sites-available/default
-        regexp: '^(\s*)listen'
-        line: 'listen 8080;'
-        backup: yes
-
-    - name: reload
-      ufw:
-        state: reloaded
-
-    - name: Enable UFW
-      ufw:
-        state: enabled
+        name: 'Nginx HTTP'
+      register: result
+#Install PHP
+    - name: Install software-properties-common
+      apt:
+        name: software-properties-common
+        state: present
+    - name: Add PHP repository 
+      apt_repository:
+        repo: ppa:ondrej/php
+    - name: update the packages
+      apt: 
+        update_cache: yes #apt get update
+    - name: install php 
+      apt:
+        name: php8.1
+        state: present
+    - name: Install PHP extensions
+      apt:
+        name:
+          - php8.1-common
+          - php8.1-mysql
+          - php8.1-xml
+          - php8.1-xmlrpc
+          - php8.1-curl
+          - php8.1-gd
+          - php8.1-imagick
+          - php8.1-cli
+          - php8.1-dev
+          - php8.1-imap
+          - php8.1-mbstring
+          - php8.1-opcache
+          - php8.1-soap
+          - php8.1-zip
+          - php8.1-redis
+          - php8.1-intl
+        state: present
+        update_cache: yes
+#Install & Configure Mysql 
+    - name: update the packages
+      apt: 
+        update_cache: yes #apt get update
+    - name: install mysql-server
+      apt:
+        name: mysql-server
+        state: present
+    - name: Install MySQL Python library
+      apt:
+        name: python-mysqldb
+        state: present
+    - name: Create MySQL database
+      mysql_db:
+        login_user: "{{ mysql_db_user }}"
+        login_password: "{{ mysql_db_password }}"
+        name: "{{ mysql_db_name }}"
+        state: present
+#install composer 
+    - name: update the packages
+      apt: 
+        update_cache: yes #apt get update
+    - name: install composer
+      apt:
+        name: composer
+        state: present
+#Clone the app 
+  #Clone the app 
+    - name: clone the app 
+      git: 
+        repo: "https://github.com/Louaykharouf26/ToDo-APP.git"
+        dest: "/var/www/html/ToDo-App"
+        update: yes

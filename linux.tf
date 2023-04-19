@@ -14,7 +14,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "resource-group" {
-  name     = "Todo-App"
+  name     = "Todo-App1"
   location = "West Europe"
 }
 
@@ -121,7 +121,7 @@ resource "azurerm_linux_virtual_machine" "linux-virtual-machine" {
   name                            = "Todo-App"
   resource_group_name             = azurerm_resource_group.resource-group.name
   location                        = azurerm_resource_group.resource-group.location
-  size                            = "Standard_B2s" #Standard_B2s Standard_F2s Standard_D2s
+  size                            = "Standard_B2s" 
   computer_name                   = "Todo-App"
   admin_username                  = "louaykharouf"
   admin_password                  = "PassStudent123"
@@ -129,10 +129,6 @@ resource "azurerm_linux_virtual_machine" "linux-virtual-machine" {
   network_interface_ids = [
     azurerm_network_interface.network-interface.id,
   ]
-  #   admin_ssh_key {
-  #     username   = "adminuser"
-  #     public_key = file("~/.ssh/id_rsa.pub")
-  #   }
 connection {
     type     = "ssh"
     user     = "louaykharouf"
@@ -143,14 +139,13 @@ connection {
   os_disk {
     name                 = "myOsDisk"
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS" #Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS Premium_ZRS
+    storage_account_type = "Standard_LRS" 
   }
 
   source_image_reference {
-    # user defined image
-    publisher = "Canonical"    #RedHat
-    offer     = "UbuntuServer" #RHEL
-    sku       = "18.04-LTS"    # or "16.04 20.04 22.04LTS"  "7-LVM"
+    publisher = "Canonical"    
+    offer     = "UbuntuServer" 
+    sku       = "18.04-LTS"    
     version   = "latest"
   }
 }

@@ -30,6 +30,20 @@ pipeline{
                     echo "======== Setting up infra execution failed ========"
                 }
             }
+             stage("Ansible configruation") {
+            steps {                
+                script {
+                    echo "======== executing ========"
+                        dir "ansible"
+                        sh "pwd"
+                        sh "ls"
+                        echo "install dependencies "
+                        sh "ansible -i hosts config-playbook.yml"
+                        echo "configure the environement for the web app "
+                        sh "ansible -i hosts web-app-config.yml"     
+                       }            
+                        }
+                    }   
         }        
    /* 
     post{
