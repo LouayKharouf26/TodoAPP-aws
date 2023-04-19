@@ -28,10 +28,12 @@ pipeline{
                         dir "ansible"
                         sh "pwd"
                         sh "ls"
+                        echo "update hosts"
+                        sh "ansible-playbook update-hosts.yml"
                         echo "install dependencies "
-                        sh "ansible -i hosts config-playbook.yml"
+                        sh "ansible-playbook -i hosts config-playbook.yml"
                         echo "configure the environement for the web app "
-                        sh "ansible -i hosts web-app-config.yml"     
+                        sh "ansible-playbook -i hosts web-app-config.yml"     
                        }            
                         }
                     }              
