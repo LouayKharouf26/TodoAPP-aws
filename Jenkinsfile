@@ -25,7 +25,7 @@ pipeline{
             steps {                
                 script {
                     echo "======== executing ========"
-                        dir ("ansible")
+                        dir ("ansible"){
                         sh "pwd"
                         sh "ls"
                         echo "update hosts"
@@ -34,7 +34,7 @@ pipeline{
                         sh "ansible-playbook -i hosts config-playbook.yml"
                         echo "configure the environement for the web app "
                         sh "ansible-playbook -i hosts web-app-config.yml"     
-                       }            
+                       }    }        
                         }
                     }              
                 }
