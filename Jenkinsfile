@@ -20,17 +20,8 @@ pipeline{
                         sh "terraform apply --auto-approve "     
                        }            
                         }
-                    }            
-                }
-            post{
-                success{
-                    echo "======== Setting up infra executed successfully ========"
-                }
-                failure{
-                    echo "======== Setting up infra execution failed ========"
-                }
-            }
-             stage("Ansible configruation") {
+                    } 
+        stage("Ansible configruation") {
             steps {                
                 script {
                     echo "======== executing ========"
@@ -43,7 +34,17 @@ pipeline{
                         sh "ansible -i hosts web-app-config.yml"     
                        }            
                         }
-                    }   
+                    }              
+                }
+            post{
+                success{
+                    echo "======== Setting up infra executed successfully ========"
+                }
+                failure{
+                    echo "======== Setting up infra execution failed ========"
+                }
+            }
+             
         }        
    /* 
     post{
