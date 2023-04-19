@@ -42,7 +42,7 @@
         chdir: "/var/www/html/ToDo-App/web-app" 
         #cmd: "composer install"
         cmd: "cp .env.example .env"
-        cmd: "php artisan migrate"
+        #cmd: "php artisan migrate"
         cmd: "php artisan key:generate"
         cmd: "php artisan storage:link"
         #cmd: "cp /mnt/e/TodoApp/ansible/ToDo-App /etc/nginx/sites-available/nginx.conf"   
