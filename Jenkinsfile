@@ -9,7 +9,7 @@ pipeline{
             }
         }
 
-       stage("Setting up infra") {
+      /* stage("Setting up infra") {
             steps {                
                 script {
                     echo "======== executing ========"
@@ -20,7 +20,7 @@ pipeline{
                         sh "terraform apply --auto-approve "     
                        }            
                         }
-                    } 
+                    } */
         stage("Ansible configruation") {
             steps {                
                 script {
