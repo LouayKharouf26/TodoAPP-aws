@@ -25,7 +25,7 @@ pipeline{
             steps {                
                 script {
                     echo "======== executing ========"
-                        dir "ansible"
+                        dir ("ansible")
                         sh "pwd"
                         sh "ls"
                         echo "update hosts"
