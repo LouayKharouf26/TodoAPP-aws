@@ -17,7 +17,7 @@ pipeline{
                        dir("web-app"){
                         sh "pwd"
                         sh "ls"
-                        sh "docker compose up"}
+                        sh "docker compose up -f ./Docker-compose.yml"}
                      //   echo "terraform init"
                       //  sh "terraform init"
                        // sh "terraform apply --auto-approve "     
