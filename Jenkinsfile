@@ -9,31 +9,35 @@ pipeline{
             }
         }
 
-       stage("Setting up infra") {
+       //stage("Setting up infra") 
+         stage("creation de image"){
             steps {                
                 script {
                     echo "======== executing ========"
+                       dir("web-app")
                         sh "pwd"
                         sh "ls"
-                        echo "terraform init"
-                        sh "terraform init"
-                        sh "terraform apply --auto-approve "     
+                        sh "docker-compose up"
+                     //   echo "terraform init"
+                      //  sh "terraform init"
+                       // sh "terraform apply --auto-approve "     
                        }            
                         }
                     } 
-        stage("Ansible configruation") {
+        stage("push to docker hub") {
             steps {                
                 script {
                     echo "======== executing ========"
-                        dir ("ansible"){
+                        dir ("web-app"){
                         sh "pwd"
                         sh "ls"
-                        echo "update hosts"
-                        sh "ansible-playbook update-hosts.yml"
-                        echo "install dependencies "
+                        echo "push to hub"
+                        sh "docker tag web louaykharouf/todo-app:web"
+                        sh "docker push louaykharouf/todo-app:web"
+                       /* echo "install dependencies "
                         sh "ansible-playbook -i hosts config-playbook.yml"
                         echo "configure the environement for the web app "
-                        sh "ansible-playbook -i hosts web-app-config.yml"     
+                        sh "ansible-playbook -i hosts web-app-config.yml"     */
                        }    }        
                         }
                     }              
