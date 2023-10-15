@@ -17,7 +17,7 @@ pipeline{
                        dir("web-app"){
                         sh "pwd"
                         sh "ls"
-                        sh "docker compose up -f ./Docker-compose.yml"}
+                        sh "docker build -t todoapp ."}
                      //   echo "terraform init"
                       //  sh "terraform init"
                        // sh "terraform apply --auto-approve "     
@@ -32,8 +32,8 @@ pipeline{
                         sh "pwd"
                         sh "ls"
                         echo "push to hub"
-                        sh "docker tag web louaykharouf/todo-app:web"
-                        sh "docker push louaykharouf/todo-app:web"
+                        sh "docker tag todoapp louaykharouf/todo-app:todoapp"
+                        sh "docker push louaykharouf/todo-app:todoapp"
                        /* echo "install dependencies "
                         sh "ansible-playbook -i hosts config-playbook.yml"
                         echo "configure the environement for the web app "
