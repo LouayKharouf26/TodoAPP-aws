@@ -14,10 +14,10 @@ pipeline{
             steps {                
                 script {
                     echo "======== executing ========"
-                       dir("web-app")
+                       dir("web-app"){
                         sh "pwd"
                         sh "ls"
-                        sh "docker-compose up"
+                        sh "docker-compose up"}
                      //   echo "terraform init"
                       //  sh "terraform init"
                        // sh "terraform apply --auto-approve "     
