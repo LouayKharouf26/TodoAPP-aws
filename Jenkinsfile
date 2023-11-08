@@ -6,38 +6,30 @@ pipeline{
                 git url: 'https://github.com/Louaykharouf26/ToDo-APP.git', branch: 'master',
                 credentialsId: 'github-credentials' //jenkins-github-creds
                 sh "ls -ltr"
-            }
-        }
-
-       //stage("Setting up infra") 
-         stage("creation de image"){
+            }}
+       stage("Setting up infra") {
             steps {                
                 script {
                     echo "======== executing ========"
-                       dir("web-app"){
                         sh "pwd"
                         sh "ls"
-                        sh "docker build -t todoapp ."}
-                     //   echo "terraform init"
-                      //  sh "terraform init"
-                       // sh "terraform apply --auto-approve "     
-                       }            
-                        }
-                    } 
-        stage("push to docker hub") {
+                        echo "terraform init"
+                        sh "terraform init"
+                        sh "terraform apply --auto-approve "     
+                       }              }     } 
+        stage("Ansible configruation") {
             steps {                
                 script {
                     echo "======== executing ========"
-                        dir ("web-app"){
+                        dir ("ansible"){
                         sh "pwd"
                         sh "ls"
-                        echo "push to hub"
-                        sh "docker tag todoapp louaykharouf/todo-app:todoapp"
-                        sh "docker push louaykharouf/todo-app:todoapp"
-                       /* echo "install dependencies "
+                        echo "update hosts"
+                        sh "ansible-playbook update-hosts.yml"
+                        echo "install dependencies "
                         sh "ansible-playbook -i hosts config-playbook.yml"
                         echo "configure the environement for the web app "
-                        sh "ansible-playbook -i hosts web-app-config.yml"     */
+                        sh "ansible-playbook -i hosts web-app-config.yml"     
                        }    }        
                         }
                     }              
