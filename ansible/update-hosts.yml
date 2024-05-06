@@ -1,19 +1,19 @@
 ---
 - name: Update hosts
   hosts: localhost
- # become: true
   vars:
     ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
-    resource_group_name: pfa
-    vm_name: "Todo-App"
-    ansible_user: "louaykharouf"
-    ansible_ssh_pass: "PassStudent123"
+    region_name: eu-west-3
+    instance_name: myapp-instance
+    ansible_user: "ubuntu"
+    ansible_ssh_private_key_file: "../ec2keyspem.pem"
   tasks: 
-  - name: trigger the API
-    shell: az vm show -d -g Todo-App1 -n {{ vm_name }} --query publicIps -o tsv
-    register: publicIP
-  - name: update the host file
-    lineinfile: 
-     dest: ./hosts
-     line: "{{ publicIP.stdout }} ansible_user={{ ansible_user }} ansible_ssh_pass={{ ansible_ssh_pass }}"
-     insertafter: EOF
+    - name: Retrieve public IP using AWS CLI
+      command: "aws ec2 describe-instances --region {{ region_name }} --filters 'Name=tag:Name,Values={{ instance_name }}' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text"
+      register: publicIP
+
+    - name: Update the host file
+      lineinfile: 
+        dest: ./hosts
+        line: "{{ publicIP.stdout }} ansible_user={{ ansible_user }} ansible_ssh_private_key_file={{ ansible_ssh_private_key_file }}"
+        insertafter: EOF

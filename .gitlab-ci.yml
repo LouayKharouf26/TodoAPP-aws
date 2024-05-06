@@ -2,6 +2,7 @@ stages:
   - setup
   - deploy
 
+
 variables:
   AWS_ACCESS_KEY_ID: "AKIAYS2NV7DOEI5Y4OH3"
   AWS_SECRET_ACCESS_KEY: "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"
@@ -14,13 +15,22 @@ before_script:
   - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   - unzip awscliv2.zip
   - ./aws/install
+  # Install Terraform
+  - curl -fsSL https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip -o /tmp/terraform.zip
+  - unzip /tmp/terraform.zip -d /usr/local/bin/
+  # Install Ansible
+  - apt-add-repository --yes --update ppa:ansible/ansible
+  - apt-get install -y ansible
 
-
-  # AWS CLI configuration
-  - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-  - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-  - aws configure set default.region $AWS_DEFAULT_REGION
-
+setup: 
+  stage: setup
+  script: 
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      # Verify Terraform installation
+    - terraform version
+      # Verify Ansible installation
+    - ansible --version
 deploy:
   stage: deploy
   script:

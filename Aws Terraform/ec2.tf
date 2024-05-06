@@ -90,7 +90,7 @@ resource "aws_instance" "myapp-instance" {
   instance_type   = "t2.micro"
   subnet_id       = aws_subnet.myapp-subnet-1.id
   associate_public_ip_address = true
-  key_name        = "ec2keys"  # Assuming you have a key_name variable defined somewhere
+  key_name        = "ec2keyspem"  # Assuming you have a key_name variable defined somewhere
     vpc_security_group_ids = [aws_security_group.myapp-security-group.id]  # Specify the security group here
 
   tags = {
