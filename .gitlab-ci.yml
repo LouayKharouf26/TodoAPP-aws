@@ -1,0 +1,28 @@
+stages:
+  - setup
+  - deploy
+
+variables:
+  AWS_ACCESS_KEY_ID: "AKIAYS2NV7DOEI5Y4OH3"
+  AWS_SECRET_ACCESS_KEY: "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"
+
+
+before_script:
+  - apt-get install -y curl
+  - apt-get install -y unzip
+  #Install Aws CLI 
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - ./aws/install
+
+
+  # AWS CLI configuration
+  - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+  - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+  - aws configure set default.region $AWS_DEFAULT_REGION
+
+deploy:
+  stage: deploy
+  script:
+    - aws --version # Example AWS CLI command, replace with your own commands
+

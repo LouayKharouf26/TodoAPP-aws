@@ -9,5 +9,5 @@ cidr_blocks = [
     }
 ]
 
-access_key = "AKIAYS2NV7DOP2ASJX44"
-secret_key = "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"
+access_key = "AKIAYS2NV7DOEI5Y4OH3"
+secret_key = "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"
