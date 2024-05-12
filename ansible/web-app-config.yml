@@ -1,63 +1,40 @@
 ---
-- name: install Project tools
-  hosts: vm
-  become: true
-  vars:
-    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
-    file_path: "/etc/nginx/sites-available/todo-app" # Update the file path
-    file_content: |
-      server {
-          listen 80;
-          listen [::]:80;
-          root /var/www/html/ToDo-App/web-app/public;
-          index  index.php index.html index.htm;
-          server_name  todo-app.westeurope.cloudapp.azure.com www.todo-app.westeurope.cloudapp.azure.com;
+- name: Install Docker
+  hosts: all
+  become: true  # Run tasks with root privileges
 
-          location / {
-              try_files $uri $uri/ =404;
-          }
+  tasks:
+    - name: Update apt package index
+      apt:
+        update_cache: yes
 
+    - name: Install packages required for Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+        state: present
 
-          # pass PHP scripts to FastCGI server
-          #
-          location ~ \.php$ {
-              include snippets/fastcgi-php.conf;
-          #
-          #       # With php-fpm (or other unix sockets):
-              fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
-          #       # With php-cgi (or other tcp sockets):
-          #       fastcgi_pass 127.0.0.1:9000;
-          }
-      }
-  tasks: 
-    - name: change to application directory
-      become_user: root
-      command: 
-        cmd: "pwd" # Update the command to run inside the desired directory
-        chdir: "/var/www/html/ToDo-App/web-app" 
-        cmd: "pwd" # Update the command to run inside the desired directory
-    - name: "install dependencies "
-      command:
-        cmd: "pwd" # Update the command to run inside the desired directory
-        chdir: "/var/www/html/ToDo-App/web-app" 
-        #cmd: "composer install"
-        cmd: "cp .env.example .env"
-        #cmd: "php artisan migrate"
-        cmd: "php artisan key:generate"
-        cmd: "php artisan storage:link"
-        #cmd: "cp /mnt/e/TodoApp/ansible/ToDo-App /etc/nginx/sites-available/nginx.conf"   
-      register: result
+    - name: Add Docker’s official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
 
-    - name: display current working directory
-      debug:
-        var: result.stdout_lines
-    - name: Create the new file
-      copy:
-        content: "{{ file_content }}"
-        dest: "{{ file_path }}"
-    - name: link to the enabled conf
-      command:
-         cmd: "ln -s /etc/nginx/sites-available/todo-app /etc/nginx/sites-enabled"
-         cmd: "chown -R www-data:www-data /var/www/html/ToDo-App/web-app/storage"
-         cmd: "chown -R www-data:www-data /var/www/html/ToDo-App/web-app/bootstrap"
-      
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce docker-ce-cli containerd.io
+        state: present
+
+    - name: Add user to the docker group
+      user:
+        name: "{{ ansible_ssh_user }}"
+        groups: docker
+        append: yes

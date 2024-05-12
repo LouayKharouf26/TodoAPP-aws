@@ -7,13 +7,13 @@
     instance_name: myapp-instance
     ansible_user: "ubuntu"
     ansible_ssh_private_key_file: "../ec2keyspem.pem"
-  tasks: 
-    - name: Retrieve public IP using AWS CLI
-      command: "aws ec2 describe-instances --region {{ region_name }} --filters 'Name=tag:Name,Values={{ instance_name }}' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text"
+  tasks:
+    - name: Retrieve public IP using AWS CLI for active instance
+      command: "aws ec2 describe-instances --region {{ region_name }} --filters 'Name=tag:Name,Values={{ instance_name }}' 'Name=instance-state-name,Values=running' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text"
       register: publicIP
 
-    - name: Update the host file
-      lineinfile: 
+    - name: Update the host file with the public IP of active instance
+      lineinfile:
         dest: ./hosts
         line: "{{ publicIP.stdout }} ansible_user={{ ansible_user }} ansible_ssh_private_key_file={{ ansible_ssh_private_key_file }}"
         insertafter: EOF
