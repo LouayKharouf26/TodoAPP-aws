@@ -1,4 +1,4 @@
 FROM bitnami/laravel:latest
-WORKDIR /WiiN
+WORKDIR /app
 COPY . /app
 EXPOSE 8000

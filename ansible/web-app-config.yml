@@ -1,40 +1,114 @@
 ---
-- name: Install Docker
-  hosts: all
-  become: true  # Run tasks with root privileges
+- name: Install Docker and set up the ToDo app
+  hosts: vm
+  become: true
+  vars:
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+  tasks: 
+    - name: Update the packages
+      apt: 
+        update_cache: yes # apt-get update
 
-  tasks:
-    - name: Update apt package index
-      apt:
-        update_cache: yes
-
-    - name: Install packages required for Docker
-      apt:
-        name:
-          - apt-transport-https
+    - name: Install packages 
+      apt: 
+        name: 
           - ca-certificates
-          - curl
-          - gnupg-agent
-          - software-properties-common
-        state: present
+          - curl 
+          - gnupg
+          - lsb-release
+          - apt-transport-https
+        state: latest 
 
-    - name: Add Docker’s official GPG key
-      apt_key:
+    - name: Add the Docker official GPG key 
+      apt_key: 
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
-    - name: Add Docker APT repository
+    - name: Set up the repository 
       apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
         state: present
+
+    - name: Update the package cache again 
+      apt:
+        update_cache: yes
 
     - name: Install Docker
       apt:
-        name: docker-ce docker-ce-cli containerd.io
+        name: 
+          - docker-ce 
+          - docker-ce-cli 
+          - containerd.io 
+          - docker-buildx-plugin 
+          - docker-compose-plugin
+        state: latest 
+
+    - name: Download Docker Compose binary
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Verify Docker Compose installation
+      command: /usr/local/bin/docker-compose --version
+      register: compose_version
+
+    - name: Print Docker Compose version
+      debug:
+        msg: "{{ compose_version.stdout }}"
+    - name: Create docker group
+      group:
+        name: docker
         state: present
 
-    - name: Add user to the docker group
+    - name: Add user to docker group
       user:
-        name: "{{ ansible_ssh_user }}"
+        name: "ubuntu"
         groups: docker
         append: yes
+
+    - name: Restart Docker service
+      systemd:
+        name: docker
+        state: restarted
+        enabled: yes
+    - name: Install Composer
+      apt:
+        name: composer
+        state: present
+    - name: Clone the app repository
+      git:
+        repo: 'https://github.com/Louaykharouf26/ToDo-APP.git'
+        dest: "/home/ubuntu/ToDo_App"
+        clone: yes
+        update: yes
+
+    - name: Install php-cli and unzip
+      apt:
+        name:
+          - php-cli
+          - unzip
+          - php-curl
+        state: present 
+
+    - name: Install PHP XML extension
+      apt:
+        name: php-xml
+        state: present
+
+    - name : composer install command 
+      shell : cd /home/ubuntu/ToDo_App/web-app && composer install 
+      environment:
+        COMPOSER_ALLOW_SUPERUSER: 1 
+    - name : execute docker compose 
+      shell : cd /home/ubuntu/ToDo_App/web-app && docker-compose up -d --build
+    - name: Copy .env.example to .env
+      shell: docker exec -it web-app_web_1 bash -c "cp TESTENV .env"
+      
+
+    - name: Generate application key
+      shell: docker exec -it web-app_web_1 bash -c "php artisan key:generate"
+      
+    - name : restart docker image 
+      shell : docker-compose restart web
+ 

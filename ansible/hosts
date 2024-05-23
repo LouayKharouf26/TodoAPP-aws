@@ -1,3 +1,3 @@
 [vm]                                                                                                                
-                                            
- ansible_user=ubuntu ansible_ssh_private_key_file=../ec2keyspem.pem
+
+35.159.109.197 ansible_user=ubuntu ansible_ssh_private_key_file=../ec2keyspem.pem

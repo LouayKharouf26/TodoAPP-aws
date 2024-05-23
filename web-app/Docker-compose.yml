@@ -9,10 +9,13 @@ services:
       MYSQL_PASSWORD: secret
     volumes:
       - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"  # Exposes MySQL port 3306 on the host
+
   web:
     build: .
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Maps host port 8000 to container port 8000
     links:
       - db
     environment:
@@ -21,6 +24,7 @@ services:
       DB_USERNAME: laravel
       DB_PASSWORD: secret
     volumes:
-      - ./vendor:/app/vendor
+      - ./vendor:/app/vendor  # Binds the host's ./vendor directory to /app/vendor in the container
+
 volumes:
-  db-data:
+  db-data:  # Defines a named volume for persisting MySQL data

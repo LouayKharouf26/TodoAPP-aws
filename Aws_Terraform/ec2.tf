@@ -1,99 +1,112 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.74.0"
+    }
+  }
+}
+
 provider "aws" {
-  region     = "eu-west-3"
+  region     = "eu-central-1"
   access_key = var.access_key
   secret_key = var.secret_key
 }
 
-variable "cidr_blocks" {
-  description = "CIDR blocks and name tags for VPC and subnets"
-  type = list(object({
-    cidr_block = string
-    name       = string
-  }))
+resource "aws_vpc" "vpc" {
+  cidr_block = "10.0.0.0/16"
 }
 
-variable "avail_zone" {
-  default = "eu-west-3a"
-}
-
-resource "aws_vpc" "myapp-vpc" {
-  cidr_block = var.cidr_blocks[0].cidr_block
+resource "aws_subnet" "subnet" {
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = "10.0.0.0/24"
+  availability_zone = "eu-central-1a"
   tags = {
-    Name = var.cidr_blocks[0].name
+    Name : "my-subnet"
   }
 }
 
-resource "aws_subnet" "myapp-subnet-1" {
-  vpc_id            = aws_vpc.myapp-vpc.id
-  cidr_block        = var.cidr_blocks[1].cidr_block
-  availability_zone = var.avail_zone
-  tags = {
-    Name = var.cidr_blocks[1].name
-  }
-}
-
-resource "aws_route_table" "myapp-route-table" {
-  vpc_id = aws_vpc.myapp-vpc.id
-
+resource "aws_route_table" "route-table" {
+  vpc_id = aws_vpc.vpc.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.myapp-internet-gateway.id
+    gateway_id = aws_internet_gateway.gateway.id
+  }
+  tags = {
+    Name : "route-table"
   }
 }
 
-resource "aws_route_table_association" "myapp-route-table-assoc" {
-  subnet_id      = aws_subnet.myapp-subnet-1.id
-  route_table_id = aws_route_table.myapp-route-table.id
+resource "aws_internet_gateway" "gateway" {
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name : "gateway"
+  }
 }
 
-resource "aws_internet_gateway" "myapp-internet-gateway" {
-  vpc_id = aws_vpc.myapp-vpc.id
+resource "aws_route_table_association" "rtb-assoc" {
+  subnet_id      = aws_subnet.subnet.id
+  route_table_id = aws_route_table.route-table.id
 }
 
-resource "aws_security_group" "myapp-security-group" {
-  vpc_id = aws_vpc.myapp-vpc.id
-
+resource "aws_security_group" "sg" {
+  vpc_id = aws_vpc.vpc.id
   ingress {
-    from_port   = 22
+    from_port   = 0
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from all IP addresses
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 8000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 23
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  tags = {
+    Name : "instances security group"
   }
 }
 
-output "dev-vpc-id" {
-  value = aws_vpc.myapp-vpc.id
-}
-
-output "dev-subnet-id" {
-  value = aws_subnet.myapp-subnet-1.id
-}
-
-data "aws_ami" "ubuntu" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["099720109477"] // Canonical
-}
-
-resource "aws_instance" "myapp-instance" {
-  ami             = data.aws_ami.ubuntu.id
-  instance_type   = "t2.micro"
-  subnet_id       = aws_subnet.myapp-subnet-1.id
+resource "aws_instance" "ec2" {
+  ami                         = "ami-06dd92ecc74fdfb36"
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.subnet.id
+  vpc_security_group_ids      = [aws_security_group.sg.id]
+  count                       = 1
+  availability_zone           = "eu-central-1a"
   associate_public_ip_address = true
-  key_name        = "ec2keyspem"  # Assuming you have a key_name variable defined somewhere
-    vpc_security_group_ids = [aws_security_group.myapp-security-group.id]  # Specify the security group here
+  key_name                    = "ec2keyspem"
 
   tags = {
-    Name = "myapp-instance"
+    Name : "myapp-instance"
   }
 }
+
+output "ip-one" {
+  value = aws_instance.ec2[0].public_ip
+}
+

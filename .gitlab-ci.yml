@@ -1,17 +1,18 @@
 stages:
   - setup
   - deploy
-
+  - terraform 
+  - ansible 
 
 variables:
   AWS_ACCESS_KEY_ID: "AKIAYS2NV7DOEI5Y4OH3"
   AWS_SECRET_ACCESS_KEY: "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"
-
+  # The SSH_PRIVATE_KEY variable should be added in GitLab CI/CD settings
 
 before_script:
-  - apt-get install -y curl
-  - apt-get install -y unzip
-  #Install Aws CLI 
+  - apt-get update -y
+  - apt-get install -y curl unzip gnupg
+  # Install AWS CLI
   - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   - unzip awscliv2.zip
   - ./aws/install
@@ -19,20 +20,45 @@ before_script:
   - curl -fsSL https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip -o /tmp/terraform.zip
   - unzip /tmp/terraform.zip -d /usr/local/bin/
   # Install Ansible
-  - apt-add-repository --yes --update ppa:ansible/ansible
+  - echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" | tee /etc/apt/sources.list.d/ansible.list
+  - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+  - apt-get update -qy
   - apt-get install -y ansible
+  # Verify Ansible installation
+  - ansible --version
+  # Create the SSH private key file
+  - mkdir -p ~/.ssh
+  #- echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+  - cat "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
+ # - chmod 700 ~/.ssh
+  - chmod 400 ~/.ssh/id_rsa
 
 setup: 
   stage: setup
   script: 
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-      # Verify Terraform installation
+    # Verify Terraform installation
     - terraform version
-      # Verify Ansible installation
+    # Verify Ansible installation
     - ansible --version
+
 deploy:
   stage: deploy
   script:
     - aws --version # Example AWS CLI command, replace with your own commands
 
+terraform:
+  stage: terraform
+  script:
+     - cd Aws_Terraform
+     - terraform init -upgrade
+     - terraform apply --auto-approve -var-file="./keys.tfvars"
+
+ansible:
+  stage: ansible
+  script:
+    - cd ansible
+    - ansible-playbook update-hosts.yml
+    - cat hosts
+    - ansible-playbook -i hosts web-app-config.yml --private-key=~/.ssh/id_rsa --ssh-common-args='-o StrictHostKeyChecking=no'
