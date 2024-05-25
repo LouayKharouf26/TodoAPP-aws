@@ -5,8 +5,8 @@ stages:
   - ansible 
 
 variables:
-  AWS_ACCESS_KEY_ID: "AKIAYS2NV7DOEI5Y4OH3"
-  AWS_SECRET_ACCESS_KEY: "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"
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
   # The SSH_PRIVATE_KEY variable should be added in GitLab CI/CD settings
 
 before_script:
